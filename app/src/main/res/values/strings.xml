@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">MyFirstAp</string>
+    <string name="app_name">My first AppStudy</string>
+    <string name="botton">kнопкa</string>
+    <string name="Alisa">Alisa</string>
 </resources>
