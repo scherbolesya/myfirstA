@@ -7,6 +7,18 @@
     android:layout_height="match_parent"
     android:background="@color/material_on_surface_emphasis_medium">
 
+    <Button
+        android:id="@+id/next_button"
+        android:text="Next"
+        android:layout_marginTop="650dp"
+        android:layout_marginStart="300dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <ImageView
         android:id="@+id/wave_imageview"
         android:layout_width="wrap_content"
@@ -41,16 +53,6 @@
         android:text="@string/Alisa"
         android:textColor="@color/white"
         android:textStyle="italic"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="600dp"
-        android:hint="Выбери кнопку с помощью RANDOM"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
