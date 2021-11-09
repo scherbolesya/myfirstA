@@ -1,29 +1,24 @@
 package com.olesya.myfirstapplication
 
 import android.content.Intent
-import android.media.Image
-import android.nfc.Tag
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
-import android.system.Os.remove
-import android.text.TextUtils.indexOf
-import android.text.TextUtils.lastIndexOf
+import android.provider.Settings
 import android.util.Log
 import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.TextView
-import com.google.android.material.tabs.TabLayout
-import java.io.RandomAccessFile
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import kotlin.random.Random
 
 private const val TAG = "MainActivity"
 private const val My_Own_Log_TAG = "MyOwnLog"
 private const val VALUE = "Value" //ключ для Bundle
 
-const val KEY = "HELLO_KEY" //ключ для intent
+const val KEY = "HELLO_KEY" //ключ для intent явного
+
+private const val GET_FILE_REQUEST = 1
 
 class MainActivity<listOf>() : AppCompatActivity() {
 
@@ -62,6 +57,7 @@ class MainActivity<listOf>() : AppCompatActivity() {
         twotext = findViewById(R.id.two_TextView)
 
         Log.d(My_Own_Log_TAG, stihstring)
+        Log.d(My_Own_Log_TAG, "onCreate")
         stihstring = stih[((stih.indexOf(stihstring)) + 1) % 12]
 
         if (savedInstanceState != null) { //проверяем не пустой ли Bundle
@@ -77,16 +73,92 @@ class MainActivity<listOf>() : AppCompatActivity() {
         val threebutton: Button = findViewById(R.id.three_button)
         val onebutton: Button = findViewById(R.id.one_button)
         val twoButton: Button = findViewById(R.id.two_button)
-        val nextButton: Button = findViewById(R.id.next_button)
+
+        val nextButton: Button = findViewById(R.id.next_button)//иниц кнопку
 
 
-        val intent = Intent(this, SecondActivity::class.java)
-        intent.putExtra(KEY, stih[0])//кладем знач в Extra
-
-        //что будет происходить при нажатии на кнопку
-        nextButton.setOnClickListener {
-            startActivity(intent)
+        //для файла
+        val fileButton : Button = findViewById(R.id.file_Button)
+        //создали intent с действием GET_CONTENT
+        val intentFileButton = Intent(Intent.ACTION_GET_CONTENT)//отыщи все актииви с помощью кот можно брать content//создали интент
+        intentFileButton.type = "file/*" //с типом файл  // чтобы не открывались галерии
+        //создаем свой результат//зарегистр для результата активности(обьект)
+        val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+               if (result.resultCode == RESULT_OK) //если результат ок
+                    result.data?.data.toString()//путь к файлу //выдать нам  файл//далее нужно использовать
+               else
+                   Toast.makeText(this, "Ничего не выбрано", Toast.LENGTH_SHORT).show()  //просто вышли ничего не выбрали
+           }
+        fileButton.setOnClickListener {
+            resultLauncher.launch(intentFileButton)//запускаем наш интент  // для файла
         }
+        //для файла конец
+
+
+        val settingsButton : Button = findViewById(R.id.settings_Button)
+        val intentSettingsButton = Intent(Settings.ACTION_ADD_ACCOUNT)//открываем настройки
+        //* intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK //ставим флаг, чтобы открывались настройки в новом окне
+        settingsButton.setOnClickListener {
+            startActivity(intentSettingsButton)
+        }
+
+        val sharebutton: Button = findViewById(R.id.share_button) //share кнопка поделиться
+        val intentt = Intent(Intent.ACTION_SEND)//есть  интент кот хочет какте то данные
+        intentt.type = "text/plain"             //с типом  данных текст
+        intentt.putExtra(Intent.EXTRA_TEXT, "Скачай приложение MyFirstAppStudy gj ссылке ")//отправлять будем extra-text
+        //intentt.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name))//EXTRA_TEXT с названием нашего приложения
+        //
+        val chooser = Intent . createChooser (intentt, "Поделиться!!!")//будет открываться нижнее диалоговое окно/только на старой версии
+        sharebutton.setOnClickListener {
+            startActivity(chooser)
+        }
+
+        val youtubeButton : Button = findViewById(R.id.youtube_Button)
+        val youtubelink = Uri.parse(  //открываем youtube
+           "vnd.youtube://rhqJP_fxdNI") // id нужного видео после//
+        val intentyoutube = Intent(Intent.ACTION_VIEW, youtubelink)//
+        youtubeButton.setOnClickListener {
+            startActivity(intentyoutube)
+        }
+
+
+        //// val intent  = Intent(Intent.ACTION_VIEW) //предложит открыть все приложения кот есть, если не указ явно
+        val intent = Intent(Intent.ACTION_HEADSET_PLUG)//intent по подключению наушников
+        if (intent.resolveActivity(packageManager) == null)//если приложения нет кнопка будет не активной
+            nextButton.isEnabled = false
+        else
+            nextButton.setOnClickListener {
+                startActivity(intent)
+            }
+
+        ///*  nextButton.setOnClickListener {
+        ///* if (intent.resolveActivity(packageManager) != null)//спросить у packageManager есть у нас хоть одна активити кот сможет это сделать
+        ///* startActivity(intent) //к  кнопке nextbutton c текстом next привязано приложение кот подключает наушники
+        ///* else
+        //Toast.makeText(this, "Нет такого приложения", Toast.LENGTH_SHORT).show() //если приложения нет выйдет toast
+        ///* (it as Button).isEnabled = false
+
+        //startActivityForResult(intent, GET_FILE_REQUEST)//старая функция
+        ///* }
+
+        val linkButton :  Button = findViewById(R.id.link_Button)
+        val link = Uri.parse("https://odin.study")//
+        val intentlinkbutton = Intent(Intent.ACTION_VIEW, link)//запускаем неявный интент кот опр-т какое прилож на устройстве откроет эту ссылку
+        //найти мне прилож кот по ACTION_VIEW  сможет открыть эти ссылки
+        linkButton.setOnClickListener {
+            startActivity(intentlinkbutton)
+        }
+
+
+
+        val secondButton : Button = findViewById(R.id.SecondActivity_Button)
+        val intentSecondActivity = Intent(this, SecondActivity::class.java)//явно указываем в какую активность переходим
+        intentSecondActivity.putExtra(KEY, stih[0])//кладем знач в Extra
+        //что будет происходить при нажатии на кнопку
+        secondButton.setOnClickListener {
+            startActivity(intentSecondActivity)
+        }
+
 
 
 //        слушатель клика
@@ -108,19 +180,21 @@ class MainActivity<listOf>() : AppCompatActivity() {
 
 
     fun randomize() {
-        val randomValue = Random.nextInt(0, 101)
+        val randomValue = Random.nextInt(1, 4)
         helloTextView.text = randomValue.toString()
     }
 
     override fun onStart() {
         super.onStart()
         Log.d(My_Own_Log_TAG, stihstring)
+        Log.d(My_Own_Log_TAG, "onStart")
         stihstring = stih[((stih.indexOf(stihstring)) + 1) % 12]
     }
 
     override fun onResume() {
         super.onResume()
         Log.d(My_Own_Log_TAG, stihstring)
+        Log.d(My_Own_Log_TAG, "onResume")
         stihstring = stih[((stih.indexOf(stihstring)) + 1) % 12]
 
     }
@@ -128,24 +202,28 @@ class MainActivity<listOf>() : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         Log.d(My_Own_Log_TAG, stihstring)
+        Log.d(My_Own_Log_TAG, "onPause")
         stihstring = stih[((stih.indexOf(stihstring)) + 1) % 12]
     }
 
     override fun onStop() {
         super.onStop()
         Log.d(My_Own_Log_TAG, stihstring)
+        Log.d(My_Own_Log_TAG, "onStop")
         stihstring = stih[((stih.indexOf(stihstring)) + 1) % 12]
     }
 
     override fun onRestart() {
         super.onRestart()
         Log.d(My_Own_Log_TAG, stihstring)
+        Log.d(My_Own_Log_TAG, "onRestart")
         stihstring = stih[((stih.indexOf(stihstring)) + 1) % 12]
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Log.d(My_Own_Log_TAG, stihstring)
+        Log.d(My_Own_Log_TAG, "onDestroy")
         stihstring = stih[(((stih.indexOf(stihstring)) + 1) % 12)]
     }
 
